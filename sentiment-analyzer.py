@@ -47,7 +47,7 @@ def main():
     elif classification.get('positive') < classification.get('negative'):
         print('Overall sentiment: negative')
     else:
-        print('Overall sentiment: neutra')
+        print('Overall sentiment: neutral')
 
 
 def train(training_data_file):
