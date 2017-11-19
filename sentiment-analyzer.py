@@ -24,7 +24,7 @@ def main():
     # Setup
     
     if len(sys.argv) < 4:
-        print('usage: sentiment-analyzer.py <number of tweets to analyze -- example: 100> <keywords -- example: "bitcoin, price"> <input training data -- example: training_data.csv')
+        print('usage: sentiment-analyzer.py <number of tweets to analyze -- example: 100> <keywords -- example: "bitcoin, price"> <input training data -- example: training_data.csv>')
         sys.exit()
 
     num_tweets = sys.argv[1]
@@ -61,13 +61,13 @@ def train(training_data_file):
     stop_words = get_stop_word_list()
     next(input_tweets, None)
     for row in input_tweets:
-        if row[0] == '0':
+        if row[1] == '0':
             sentiment = 'negative'
-        elif row[0] == '1':
+        elif row[1] == '1':
             sentiment = 'neutral'
         else:
             sentiment = 'positive'
-        tweet = row[1]
+        tweet = row[0]
         processed_tweet = process_tweet(tweet)
         feature_vector = get_feature_vector(processed_tweet)
         feature_list.extend(feature_vector)
@@ -82,7 +82,7 @@ def train(training_data_file):
     # Train the classifier
     naive_bayes_classifier = nltk.NaiveBayesClassifier.train(training_set)
 
-    print(naive_bayes_classifier.show_most_informative_features(50))
+    #print(naive_bayes_classifier.show_most_informative_features(50))
 
     return naive_bayes_classifier
 
@@ -106,16 +106,16 @@ def classify(num_tweets, keywords, classifier):
     for tweet in unprocessed_tweets:
         encoded = tweet.text.encode("utf-8")
         processed = process_tweet(encoded)
-        print(processed)
+        #print(processed)
         if classifier.classify(extract_features(get_feature_vector(processed))) == 'positive':
             count_positive += 1
-            print('positive')
+            #print('positive')
         elif classifier.classify(extract_features(get_feature_vector(processed))) == 'negative':
             count_negative += 1
-            print('negative')
+            #print('negative')
         else:
             count_neutral += 1
-            print('neutral')
+            #print('neutral')
         total += 1
 
     return dict((('positive', count_positive), ('negative', count_negative), ('neutral', count_neutral)))

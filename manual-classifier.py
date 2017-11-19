@@ -14,12 +14,13 @@ import config
 
 def main():
 
-    if len(sys.argv) < 3:
-        print('usage: manual-classifier.py <number of tweets to classify -- example: 100> <keywords -- example: "bitcoin, price">')
+    if len(sys.argv) < 4:
+        print('usage: manual-classifier.py <number of tweets to classify -- example: 100> <keywords -- example: "bitcoin, price"> <output training data -- example: training_data.csv>')
         sys.exit()
 
     num_tweets = sys.argv[1]
     keywords = sys.argv[2]
+    training_data_file = sys.argv[3]
 
     tweets = get_last_tweets(num_tweets, keywords)
     classification = {}
