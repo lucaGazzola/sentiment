@@ -7,7 +7,8 @@ A simple python project to analyze the sentiment that emerges from the last twee
 First of all you need some training data to train the Naive Bayes Classifier used in sentiment-analyzer.py.
 Unfortunately, twitter policy does not allow to distribute tweet text (although i suspect if you look hard enough you can still find something online).
 The solution is to classify some tweets manually, the more tweets you classify, the better your classifier will be (roughly speaking).
-I wrote a script that lets you do just this: run it with
+I wrote a script that lets you do just this. First of all you need to get a twitter API key, which you can find at https://apps.twitter.com/ , so that you can search through the most recent tweets for a specific topic. Once you obtained the needed keys, put them in the config file.
+Now you can manually classify tweets running:
 
 ```
 manual-classifier.py <number of tweets to classify> <keywords> <destination csv file for the classification> 
