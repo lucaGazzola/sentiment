@@ -169,7 +169,6 @@ def get_stop_word_list():
     stop_words = ['AT_USER', 'URL']
 
     # read stopwords from url
-    # noinspection PyUnresolvedReferences
     data = urllib.request.urlopen('https://github.com/ravikiranj/twitter-sentiment-analyzer/blob/master/data/feature_list/stopwords.txt')
 
     for line in data:

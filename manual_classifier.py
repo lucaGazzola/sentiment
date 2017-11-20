@@ -7,7 +7,6 @@ Gets the last 'num_tweets' tweets containing 'keywords' and lets you manually cl
 '''
 import csv
 import tweepy
-import urllib
 import sys
 import config
 
@@ -32,7 +31,7 @@ def main():
         if sentiment != '3':
             classification[encoded] = sentiment
 
-    with open('training_data.csv', 'w', newline='') as f:
+    with open(training_data_file, 'w', newline='') as f:
         fieldnames = ['Tweet', 'Sentiment']
         writer = csv.DictWriter(f, fieldnames=fieldnames)
         writer.writeheader()
