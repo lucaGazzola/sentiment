@@ -16,8 +16,6 @@ import config
 import sys
 
 feature_list = []
-stop_words = []
-
 
 def main():
 
@@ -30,14 +28,17 @@ def main():
     num_tweets = sys.argv[1]
     keywords = sys.argv[2]
     training_data_file = sys.argv[3]
+    
+    # Get stop words list
+    stop_words = get_stop_word_list()
 
     # Training
 
-    nb_classifier = train(training_data_file)
+    nb_classifier = train(training_data_file, stop_words)
 
     # Classification
 
-    classification = classify(num_tweets, keywords, nb_classifier)
+    classification = classify(num_tweets, keywords, nb_classifier, stop_words)
 
     print('positive tweets: {0}'.format(classification.get('positive')))
     print('negative tweets: {0}'.format(classification.get('negative')))
@@ -50,15 +51,13 @@ def main():
         print('Overall sentiment: neutral')
 
 
-def train(training_data_file):
+def train(training_data_file, stop_words):
 
-    global feature_list
-    global stop_words
+    global feature_list   
 
     # Read the tweets in the training dataset one by one and process them
     input_tweets = csv.reader(open(training_data_file, 'r'), delimiter=',')
     tweets = []
-    stop_words = get_stop_word_list()
     next(input_tweets, None)
     for row in input_tweets:
         if row[1] == '0':
@@ -69,14 +68,15 @@ def train(training_data_file):
             sentiment = 'positive'
         tweet = row[0]
         processed_tweet = process_tweet(tweet)
-        feature_vector = get_feature_vector(processed_tweet)
+        feature_vector = get_feature_vector(processed_tweet, stop_words)
         feature_list.extend(feature_vector)
         tweets.append((feature_vector, sentiment))
 
     # remove duplicates
     feature_list = list(set(feature_list))
-
-    # Extract feature vector for all tweets in one shot
+    
+    # Build training set with feature lists
+    # memory efficient but requires global variable to store feature_list
     training_set = nltk.classify.util.apply_features(extract_features, tweets)
 
     # Train the classifier
@@ -87,7 +87,7 @@ def train(training_data_file):
     return naive_bayes_classifier
 
 
-def classify(num_tweets, keywords, classifier):
+def classify(num_tweets, keywords, classifier, stop_words):
 
     # Twitter API setup
     auth = tweepy.OAuthHandler(config.twitter_api['consumer_key'], config.twitter_api['consumer_secret'])
@@ -107,10 +107,10 @@ def classify(num_tweets, keywords, classifier):
         encoded = tweet.text.encode("utf-8")
         processed = process_tweet(encoded)
         #print(processed)
-        if classifier.classify(extract_features(get_feature_vector(processed))) == 'positive':
+        if classifier.classify(extract_features(get_feature_vector(processed, stop_words))) == 'positive':
             count_positive += 1
             #print('positive')
-        elif classifier.classify(extract_features(get_feature_vector(processed))) == 'negative':
+        elif classifier.classify(extract_features(get_feature_vector(processed, stop_words))) == 'negative':
             count_negative += 1
             #print('negative')
         else:
@@ -121,13 +121,15 @@ def classify(num_tweets, keywords, classifier):
     return dict((('positive', count_positive), ('negative', count_negative), ('neutral', count_neutral)))
 
 
-# start extract_features
+# extracts informative features from tweets
 def extract_features(tweet):
 
     global feature_list
     # remove duplicates
+    
+    #print(tweet[0])
     feature_list = list(set(feature_list))
-    tweet_words = set(tweet)
+    tweet_words = set(tweet[0])
     features = {}
     for word in feature_list:
         features['contains(%s)' % word] = (word in tweet_words)
@@ -163,8 +165,6 @@ def replace_two_or_more(s):
 # get list of stop words
 def get_stop_word_list():
 
-    global stop_words
-
     # add fixed stopwords
     stop_words = ['AT_USER', 'URL']
 
@@ -178,9 +178,8 @@ def get_stop_word_list():
 
 
 # get the feature vector
-def get_feature_vector(tweet):
+def get_feature_vector(tweet, stop_words):
 
-    global stop_words
     feature_vector = []
     # split tweet into words
     words = tweet.split()
