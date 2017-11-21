@@ -1,6 +1,6 @@
 # Sentiment
 
-A simple python project to analyze the sentiment that emerges from the last tweets containing some keywords
+A simple sentiment analysis python project. It analyzes the sentiment that emerges from the last tweets containing user specified keywords
 
 ## Getting Started
 
@@ -17,7 +17,16 @@ example:
 ```
 manual-classifier.py 1000 "bitcoin, price" training_data.csv
 ```
-at this point you can run the analyzer with the training data you classified (or some better dataset you found on the internet):
+at this point you can run the analyzer with the training data you classified (or some better dataset you found on the internet).
+The csv format is <tweet, sentiment> where tweet is a string and sentiment is an integer:
+
+0: negative sentiment
+1: neutral sentiment
+2: positive sentiment
+
+example: <"Great day at work!",2>
+
+run the analyzer with:
 
 ```
 sentiment-analyzer.py <number of tweets to classify> <keywords> <input csv file needed to train the classifier> 

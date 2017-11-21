@@ -33,11 +33,9 @@ def main():
     stop_words = get_stop_word_list()
 
     # Training
-
     nb_classifier = train(training_data_file, stop_words)
 
     # Classification
-
     classification = classify(num_tweets, keywords, nb_classifier, stop_words)
 
     print('positive tweets: {0}'.format(classification.get('positive')))
@@ -106,11 +104,12 @@ def classify(num_tweets, keywords, classifier, stop_words):
     for tweet in unprocessed_tweets:
         encoded = tweet.text.encode("utf-8")
         processed = process_tweet(encoded)
+        sentiment = classifier.classify(extract_features(get_feature_vector(processed, stop_words)))
         #print(processed)
-        if classifier.classify(extract_features(get_feature_vector(processed, stop_words))) == 'positive':
+        if sentiment == 'positive':
             count_positive += 1
             #print('positive')
-        elif classifier.classify(extract_features(get_feature_vector(processed, stop_words))) == 'negative':
+        elif sentiment == 'negative':
             count_negative += 1
             #print('negative')
         else:
@@ -125,11 +124,8 @@ def classify(num_tweets, keywords, classifier, stop_words):
 def extract_features(tweet):
 
     global feature_list
-    # remove duplicates
     
-    #print(tweet[0])
-    feature_list = list(set(feature_list))
-    tweet_words = set(tweet[0])
+    tweet_words = set(tweet)
     features = {}
     for word in feature_list:
         features['contains(%s)' % word] = (word in tweet_words)
@@ -157,7 +153,7 @@ def process_tweet(tweet):
 # replace two+ letter occurrences
 def replace_two_or_more(s):
 
-    # look for 2 or more repetitions of character and replace with the character itself
+    # looks for 2 or more repetitions of character and replace with the character itself
     pattern = re.compile(r"(.)\1{1+}", re.DOTALL)
     return pattern.sub(r"\1\1", s)
 
@@ -171,6 +167,7 @@ def get_stop_word_list():
     # read stopwords from url
     data = urllib.request.urlopen('https://github.com/ravikiranj/twitter-sentiment-analyzer/blob/master/data/feature_list/stopwords.txt')
 
+    # builds stop words list
     for line in data:
         word = line.strip()
         stop_words.append(word)
